@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup as BS
 import threading
 import csv
+import os
 
 
 class DetectThread(threading.Thread):
@@ -28,9 +29,20 @@ class ProxyIPs:
 		self.small_ip_pool = []
 		self.ip_pool = []
 		self.ip_pop = ip_population
-		self.total_good_ips = 0  # wait to be adjusted
+		self.total_good_ips = 0
 		self.ip_pool_divided = []
 		self.threads = []
+		self.init_pool()
+
+	def init_pool(self):
+		if os.path.exists("ip_pool.csv"):
+			f = open("ip_pool.csv", "r")
+			data = csv.reader(f)
+			for thing in data:
+				self.ip_pool.append(eval(thing[0]))
+			self.total_good_ips += len(self.ip_pool)
+		else:
+			pass
 
 	def get_ips(self, page_num=1):
 		if page_num == 1:
@@ -66,9 +78,13 @@ class ProxyIPs:
 		try:
 			res = requests.get(detect_url, proxies={"http": proxy_host}, timeout=3)
 			if res.status_code == 200:
-				print(ip + " is Good one.")
-				self.total_good_ips += 1
-				return True
+				if thing not in self.ip_pool:
+					print(ip + " is Good one.")
+					self.total_good_ips += 1
+					return True
+				else:
+					print(ip + " is already in pool.")
+					return False
 			else:
 				return False
 		except:
@@ -96,7 +112,6 @@ class ProxyIPs:
 			t.start()
 		while True:
 			if THREAD_IS_DONE == len(self.ip_pool_divided):
-				THREAD_IS_DONE = 0
 				self.threads = []
 				self.ip_pool_divided = []
 				break
@@ -131,7 +146,11 @@ class ProxyIPs:
 		self.small_ip_pool = []
 		return None
 
+	def __str__(self):
+		string = "Total %s IPs can work. Try '.ip_pool' attribute to get them." % str(self.total_good_ips)
+		return string
+
 
 if __name__ == '__main__':
 	p = ProxyIPs()
-	p.detect_saved_ips()
+	print(p)
