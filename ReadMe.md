@@ -10,4 +10,6 @@ This program is used to seach for some proxy servers.
 
 Program codes.
 
-### To do
+### ip_pool.csv
+
+The IPs avaliable.

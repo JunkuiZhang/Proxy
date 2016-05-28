@@ -146,6 +146,15 @@ class ProxyIPs:
 		self.small_ip_pool = []
 		return None
 
+	def update(self):
+		self.small_ip_pool = self.ip_pool
+		self.ip_pool = []
+		self.detect_pool(self.small_ip_pool)
+		self.small_ip_pool = []
+		self.total_good_ips = len(self.ip_pool)
+		self.initialize_ip_pool()
+		return None
+
 	def __str__(self):
 		string = "Total %s IPs can work. Try '.ip_pool' attribute to get them." % str(self.total_good_ips)
 		return string
@@ -153,4 +162,4 @@ class ProxyIPs:
 
 if __name__ == '__main__':
 	p = ProxyIPs()
-	print(p)
+	p.update()
